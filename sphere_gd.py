@@ -2,7 +2,7 @@
 """
 Created on Sat Oct 23 14:42:42 2021
 
-@author: rober
+@author: Robert Morton
 """
 
 import numpy as np
@@ -87,7 +87,7 @@ def get_orthonormal_basis(x):
     
     return np.stack(vectors[1:], axis=1)
 
-def spherical_gd_step(x, gradient, alpha, max_step):
+def spherical_gd_step(x, gradient, alpha, max_step, min_norm=1e-13):
     """
     Return x after one step of gradient descent,
     with x constrained to be on the surface of a unit sphere (have norm 1)
@@ -101,6 +101,8 @@ def spherical_gd_step(x, gradient, alpha, max_step):
             The learning rate.
         max_step: double
             The maximum step angle.
+        min_norm: double
+            The minimum gradient norm needed to take any step.
 
     Return:
         The updated position of x.
@@ -115,6 +117,12 @@ def spherical_gd_step(x, gradient, alpha, max_step):
     # Get the norm of the basis gradient
     # both to control step size and to normalize
     step_norm = np.linalg.norm(basis_grad)
+    
+    # If the step norm is too small, we can't safely divide by it
+    # and it'll be fine to ignore it
+    # so ignore it
+    if step_norm < min_norm:
+        return x
     
     # The point on the equator of the sphere to step towards
     step_target = basis_grad / (-step_norm)
