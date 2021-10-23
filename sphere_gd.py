@@ -55,7 +55,7 @@ def get_orthonormal_vector(vectors, min_norm=1e-8):
         
         # Make it normal to all the previous vectors
         for v in vectors:
-            vector -= vector * (np.dot(vector, v))
+            vector -= v * (np.dot(vector, v))
         
         norm = np.linalg.norm(vector)
         
@@ -119,7 +119,14 @@ def spherical_gd_step(x, gradient, alpha, max_step):
     # The point on the equator of the sphere to step towards
     step_target = basis_grad / (-step_norm)
     
+    # Convert this into the full space
+    step_target = basis @ step_target
+    
+    # print('step norm: {:5f}'.format(np.linalg.norm(step_target)))
+    
     # The angle to step by
     angle = min(alpha * step_norm, max_step)
+    
+    # Maybe normalize the result to get rid of small error
     
     return np.cos(angle) * x + np.sin(angle) * step_target
