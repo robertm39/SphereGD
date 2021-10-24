@@ -120,7 +120,12 @@ def pack_spheres(dimensions,
         for i in range(num_spheres):
             sphere = spheres[i]
             others = spheres[:i] + spheres[i+1:]
-            grad = sphere_loss_grad(sphere, others, loss_power)
+            
+            # Pad the minimum distance?
+            grad = sphere_loss_grad(sphere,
+                                    others,
+                                    loss_power,
+                                    min_dist=1 + 1e-7)
             
             prev_grad = prev_grads[i]
             new_grads.append(grad + momentum * prev_grad)
@@ -160,13 +165,13 @@ def pack_spheres(dimensions,
     print('min dist: {:.8f}, overlaps: {}'.format(min_dist, overlaps))
 
 def main():
-    pack_spheres(dimensions=4,
-                 num_spheres=22,
+    pack_spheres(dimensions=6,
+                 num_spheres=72,
                  loss_power=1,
                  alpha=0.1,
                  max_step=np.pi/9,
                  momentum=0.9,
-                 num_steps=30000,
+                 num_steps=300000,
                  print_freq=100)
 
 if __name__ == '__main__':
